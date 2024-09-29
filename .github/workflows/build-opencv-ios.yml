@@ -1,0 +1,46 @@
+name: Build OpenCV for iOS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        brew install python3
+        python3 --version
+
+    - name: Clone OpenCV repository
+      run: |
+        git clone https://github.com/opencv/opencv.git
+        cd opencv
+        git checkout tags/4.9.0
+
+    - name: Build OpenCV XCFramework
+      run: |
+        cd opencv
+        python3 platforms/apple/build_xcframework.py --out build_all \
+        --iphoneos_deployment_target 14.0 \
+        --iphoneos_archs arm64 \
+        --iphonesimulator_archs arm64,x86_64 \
+        --visionos_archs arm64 \
+        --visionsimulator_archs arm64 \
+        --build_only_specified_archs True \
+        --without objc
+
+    - name: Upload built XCFramework (optional)
+      uses: actions/upload-artifact@v2
+      with:
+        name: opencv-xcframework
+        path: opencv/build_all
