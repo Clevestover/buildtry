@@ -40,7 +40,7 @@ jobs:
         --without objc
 
     - name: Upload built XCFramework (optional)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: opencv-xcframework
         path: opencv/build_all
